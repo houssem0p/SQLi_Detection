@@ -1,6 +1,7 @@
 ## SQL Injection Detection
 
 This project detects SQL injection attempts using a machine learning model.
+🛡️ **Live Demo**: https://sq-li-detection.vercel.app/
 
 ### How it works
 
