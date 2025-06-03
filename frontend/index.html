@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Detection Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .safe {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .dangerous {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .loading {
+            color: #31708f;
+            background-color: #d9edf7;
+            border: 1px solid #bce8f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SQL Injection Detection</h1>
+        <p>Enter a SQL query to check if it contains potentially dangerous injection patterns:</p>
+        
+        <textarea id="queryInput" placeholder="SELECT * FROM users WHERE username = 'admin' AND password = 'password'"></textarea>
+        
+        <button id="checkButton">Check Query</button>
+        
+        <div id="resultContainer" class="result" style="display: none;">
+            <h3>Analysis Result:</h3>
+            <p id="resultText"></p>
+            <p id="confidenceText"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('checkButton').addEventListener('click', checkQuery);
+        
+        async function checkQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            if (!query) {
+                alert('Please enter a SQL query to analyze');
+                return;
+            }
+            
+          
+            resultContainer.style.display = 'block';
+            resultContainer.className = 'result loading';
+            resultText.textContent = 'Analyzing query...';
+            confidenceText.textContent = '';
+            
+            try {
+                
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+               
+                if (data.is_malicious) {
+                    resultContainer.className = 'result dangerous';
+                    resultText.textContent = '⚠️ Dangerous SQL query detected!';
+                } else {
+                    resultContainer.className = 'result safe';
+                    resultText.textContent = '✅ Query appears to be safe';
+                }
+                
+               
+                
+            } catch (error) {
+                resultContainer.className = 'result dangerous';
+                resultText.textContent = 'Error analyzing query: ' + error.message;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

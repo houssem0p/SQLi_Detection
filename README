@@ -1,0 +1,24 @@
+## SQL Injection Detection
+
+This project detects SQL injection attempts using a machine learning model.
+
+### How it works
+
+- `SQLi_model.ipynb`: Jupyter notebook with all code for data cleaning, model training, and saving the model.
+- `backend/`: Flask API to serve predictions.
+- `frontend/`: Simple HTML/JS/CSS frontend.
+
+### How to use
+
+1. **Train the model**
+   - Open `SQLi_model.ipynb` and run all cells.
+   - This will generate `model.pkl` and `vectorizer.pkl`.
+
+2. **Run the backend**
+   - Install requirements: `pip install -r requirements.txt`
+   - Start the server: `python app.py`
+
+3. **Open the frontend**
+   - Open `frontend/index.html` in your browser.
+
+> **Note:** The repo does not include the trained model or data files. You must run the notebook to generate them.
